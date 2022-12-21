@@ -7,6 +7,7 @@ router = routers.DefaultRouter()
 router.register('produto', v.ProdutoViewSet)
 router.register('compra', v.CompraViewSet)
 router.register('compraproduto', v.CompraProdutoViewSet)
+router.register('user', v.UserViewSet)
 
 
 urlpatterns = router.urls

@@ -9,6 +9,8 @@ from rest_framework import status
 from . import serializers as s
 from . import models as m
 
+
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = m.User.objects.using('default')
     serializer_class = s.UserSerializer
@@ -26,6 +28,17 @@ class UserViewSet(viewsets.ModelViewSet):
 class ProdutoViewSet(viewsets.ModelViewSet):
     queryset = m.Produto.objects.using('default')
     serializer_class = s.ProdutoSerializer
+
+    @action(detail=False, methods=['post'])
+    def get_produtos_by_user(self, *args, **kwargs):
+        qs = m.Produto.objects.using('default')
+        req = self.request.data
+
+        user_id = req['user_id'] if 'user_id' in req else None
+
+        if user_id: qs = qs.filter(user=user_id)
+        serializer = s.ProdutoSerializer(qs, many=True).data
+        return Response(serializer, status=status.HTTP_200_OK)
 
 
 
