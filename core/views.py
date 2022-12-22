@@ -47,7 +47,47 @@ class CompraViewSet(viewsets.ModelViewSet):
     serializer_class = s.CompraSerializer
 
 
+    @action(detail=False, methods=['post'])
+    def get_requests_by_user(self, *args, **kwargs):
+        qs = m.Compra.objects.using('default')
+        req = self.request.data
+
+        qs = qs.filter(user_id=req['user_id'])
+        serializer = s.CompraSerializer(qs, many=True).data
+
+        return Response(serializer, status=200)
+
+
+
+
 class CompraProdutoViewSet(viewsets.ModelViewSet):
     queryset = m.CompraProduto.objects.using('default')
     serializer_class = s.CompraProdutoSerializer
 
+
+    @action(detail=False, methods=['post'])
+    def get_itens_by_request_id(self, *args, **kwargs):
+        qs = m.CompraProduto.objects.using('default')
+        req = self.request.data
+
+        request_id = req['request_id'] if 'request_id' in req else None
+        if request_id: qs = qs.filter(compra_id=request_id)
+        
+        serializer = s.CompraProdutoSerializer(qs, many=True).data
+        return Response(serializer, status=200)
+
+
+    @action(detail=False, methods=['post'])
+    def save_itens_compra(self, *args, **kwargs):
+        req = self.request.data
+
+        user_id = req['user_id'] if 'user_id' in req else None
+        compra_id = req['compra_id'] if 'compra_id' in req else None
+        itens = req['itens'] if 'itens' in req else None
+
+
+        for item in itens:
+            cp = m.CompraProduto(compra_id=compra_id,user_id=user_id, produto_id=item['id'])
+            cp.save()
+
+        return Response(data='OK', status=200)
