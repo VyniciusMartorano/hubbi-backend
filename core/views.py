@@ -68,12 +68,15 @@ class CompraProdutoViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def get_itens_by_request_id(self, *args, **kwargs):
         qs = m.CompraProduto.objects.using('default')
+        qs_produtos = m.Produto.objects.using('default')
         req = self.request.data
 
         request_id = req['request_id'] if 'request_id' in req else None
-        if request_id: qs = qs.filter(compra_id=request_id)
+        if request_id: 
+            produtos = qs.filter(compra_id=request_id).values_list('produto')
+            qs_produtos = qs_produtos.filter(id__in=produtos)
         
-        serializer = s.CompraProdutoSerializer(qs, many=True).data
+        serializer = s.ProdutoSerializer(qs_produtos, many=True).data   
         return Response(serializer, status=200)
 
 
