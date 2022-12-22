@@ -4,8 +4,11 @@ Criar ambiente virtual
   
   python -m venv venv
 
-ativar ambiente virtual
+Ativar ambiente virtual
   venv/scripts/activate
+ 
+Instalar dependencias
+  pip install -r requirements.txt
   
   
  Rodar servidor
